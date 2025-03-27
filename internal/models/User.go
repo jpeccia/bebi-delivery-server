@@ -4,10 +4,9 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	ID uint `gorm:"primaryKey"`
-	username string `json:"username"`
-	password string `json:"password"`
-	phone string `json:"phone"     gorm:"unique"`
-	address string `json:"address"` 
-	role Role `json:"role" gorm:"default:customer`
+    Username string `json:"username"`
+    Password string `json:"password"`
+    Phone    string `json:"phone" gorm:"unique"`
+    Address  string `json:"address"`
+	Role Role `json:"role" gorm:"default:customer`
 }
