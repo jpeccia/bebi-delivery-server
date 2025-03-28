@@ -42,3 +42,11 @@ func GetUsers() ([]models.User, error){
 	}
 	return users, nil
 }
+
+func UpdateUser(user *models.User) error {
+	if err := database.DB.Save(user).Error; err != nil{
+		return err
+	}
+	return nil
+}
+
