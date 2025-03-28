@@ -18,8 +18,8 @@ func MigrateDB() {
 	)
 
 	if err != nil {
-		log.Fatal("Erro ao aplicar as migrations: %v", err)
+		log.Printf("Erro ao aplicar as migrations: %v", err)
 	}
-	
+
 	log.Println("Migrations aplicadas com sucesso!")
 }
