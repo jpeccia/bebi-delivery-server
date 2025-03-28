@@ -34,3 +34,11 @@ func GetUserByUsername(username string) (*models.User, error) {
 	}
 	return &user, nil
 }
+
+func GetUsers() ([]models.User, error){
+	var users []models.User
+	if err := database.DB.Find(&users).Error; err != nil{
+		return nil, err
+	}
+	return users, nil
+}
