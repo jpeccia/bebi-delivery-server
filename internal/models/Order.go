@@ -9,6 +9,4 @@ type Order struct {
 	StoreId    uint        `json:"store_id"`
 	Status     OrderStatus `json:"status" gorm:"default:'pending'"`
 	TotalPrice float64     `json:"total_price"`
-	Customer   User        `gorm:"foreignKey:CustomerID" json:"customer"`
-	Store      Store       `gorm:"foreignKey:StoreID" json:"store"`
 }
