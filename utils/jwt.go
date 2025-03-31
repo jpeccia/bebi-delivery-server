@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -37,3 +38,23 @@ func GenerateJWT(user *models.User) (string, error) {
 	return tokenString, nil
 }
 
+func ParseToken(tokenString string) (uint, string, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecret, nil
+	})
+	if err != nil || !token.Valid {
+		return 0, "", err
+	}
+
+	claims, ok := token.Claims.(*CustomClaims)
+	if !ok {
+		return 0, "", fmt.Errorf("Não foi possivel converter os claims")
+	}
+
+	id, err := strconv.ParseUint(claims.Subject, 10, 64)
+	if err != nil {
+		return 0, "", err
+	}
+
+	return uint(id), claims.Role, nil
+}
