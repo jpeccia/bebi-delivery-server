@@ -1,58 +1,54 @@
 package repositories
 
 import (
-	"github.com/jpeccia/bebi-delivery-server/internal/database"
 	"github.com/jpeccia/bebi-delivery-server/internal/models"
 	"gorm.io/gorm"
 )
 
-func CreateUser(user *models.User) error {
-	if err := database.DB.Create(user).Error; err != nil {
-		return err
-	}
-	return nil
+type UserRepository interface {
+	Create(user *models.User) error
+	GetById(id uint) (*models.User, error)
+	GetByUsername(username string) (*models.User, error)
+	GetAl() ([]models.User, error)
+	Update(user *models.User) error
+	Delete(id uint) error
 }
 
-func GetUserById(userID uint) (*models.User, error) {
-	var user models.User
-	if err := database.DB.First(&user, userID).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, nil
-		}
-		return nil, err
-	}
-	return &user, nil
+type userRepository struct {
+	db *gorm.DB
 }
 
-func GetUserByUsername(username string) (*models.User, error) {
-	var user models.User
-	if err := database.DB.Where("username = ?", username).First(&user).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, nil
-		}
-		return nil, err
-	}
-	return &user, nil
+func NewUserRepository(db *gorm.DB) UserRepository {
+	return &userRepository{db}
 }
 
-func GetUsers() ([]models.User, error) {
+func (u *userRepository) Create(user *models.User) error {
+	return u.db.Create(user).Error
+}
+
+func (u *userRepository) Delete(id uint) error {
+	return u.db.Delete(&models.User{}, id).Error
+}
+
+func (u *userRepository) GetAl() ([]models.User, error) {
 	var users []models.User
-	if err := database.DB.Find(&users).Error; err != nil {
-		return nil, err
-	}
-	return users, nil
+	err := u.db.Find(&users).Error
+	return users, err
 }
 
-func UpdateUser(user *models.User) error {
-	if err := database.DB.Save(user).Error; err != nil {
-		return err
-	}
-	return nil
+func (u *userRepository) GetById(id uint) (*models.User, error) {
+	var user models.User
+	err := u.db.First(&user, id).Error
+	return &user, err
 }
 
-func DeleteUser(userID uint) error {
-	if err := database.DB.Delete(&models.User{}, userID).Error; err != nil {
-		return err
-	}
-	return nil
+func (u *userRepository) GetByUsername(username string) (*models.User, error) {
+	var user models.User
+	err := u.db.First(&user, username).Error
+	return &user, err
 }
+
+func (u *userRepository) Update(user *models.User) error {
+	return u.db.Save(user).Error
+}
+
