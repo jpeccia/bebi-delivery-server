@@ -5,7 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/golang-jwt/jwt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jpeccia/bebi-delivery-server/internal/models"
 )
@@ -37,3 +36,4 @@ func GenerateJWT(user *models.User) (string, error) {
 
 	return tokenString, nil
 }
+
