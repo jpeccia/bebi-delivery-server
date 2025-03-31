@@ -30,17 +30,13 @@ func GenerateJWT(user *models.User) (string, error) {
 	}
 	
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtSecret)
-	if err != nil {
-		return "", err
-	}
 
-	return tokenString, nil
+	return token.SignedString([]byte(jwtSecret))
 }
 
 func ParseToken(tokenString string) (uint, string, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
+		return []byte(jwtSecret), nil
 	})
 	if err != nil || !token.Valid {
 		return 0, "", err
@@ -48,7 +44,7 @@ func ParseToken(tokenString string) (uint, string, error) {
 
 	claims, ok := token.Claims.(*CustomClaims)
 	if !ok {
-		return 0, "", fmt.Errorf("Não foi possivel converter os claims")
+		return 0, "", fmt.Errorf("token inválido ou claims não convertidos corretamente")
 	}
 
 	id, err := strconv.ParseUint(claims.Subject, 10, 64)
