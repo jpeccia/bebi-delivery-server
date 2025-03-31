@@ -5,6 +5,7 @@ import (
 
 	"github.com/jpeccia/bebi-delivery-server/internal/models"
 	"github.com/jpeccia/bebi-delivery-server/internal/repositories"
+	"github.com/jpeccia/bebi-delivery-server/utils"
 )
 
 type UserService struct {
@@ -31,4 +32,23 @@ func (s *UserService) UpgradeToStoreOwner(userID uint) error {
 
 	user.Role = "STORE_OWNER"
 	return s.repo.Update(user)
+}
+
+func (s *UserService) AuthenticateUser(username, password string) (string, error) {
+	user, err := s.repo.GetByUsername(username)
+	if err != nil {
+		return "", errors.New("usuário não encontrado")
+	}
+
+	err = utils.VerifyPassword(user.Password, password)
+	if err != nil {
+		return "", errors.New("senha incorreta")
+	}
+
+	token, err := utils.GenerateJWT(user)
+	if err != nil {
+		return "", errors.New("erro ao gerar token")
+	}
+
+	return token, nil
 }
