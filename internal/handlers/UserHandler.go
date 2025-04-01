@@ -13,6 +13,11 @@ type UserHandler struct {
 	service *services.UserService
 }
 
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func NewUserHandler(service *services.UserService) *UserHandler {
 	return &UserHandler{service: service}
 }
@@ -46,4 +51,20 @@ func (h *UserHandler) UpgradeToStoreOwner(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Usuário agora é um StoreOwner"})
+}
+
+func (h *UserHandler) Login(c *gin.Context) {
+	var req LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Dados Inválidos"})
+		return
+	}
+
+	token, err := h.service.AuthenticateUser(req.Username, req.Password)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": token})
 }
