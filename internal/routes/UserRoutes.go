@@ -6,8 +6,8 @@ import (
 	"github.com/jpeccia/bebi-delivery-server/internal/middlewares"
 )
 
-func UserRoutes(router *gin.Engine, userHandler *handlers.UserHandler) {
-	userGroup := router.Group("/users")
+func UserRoutes(r *gin.RouterGroup, userHandler *handlers.UserHandler) {
+	userGroup := r.Group("/users")
 	{
 		userGroup.POST("/register", userHandler.RegisterUser)
 		userGroup.POST("/login", userHandler.Login)
