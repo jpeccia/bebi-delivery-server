@@ -17,7 +17,13 @@ func NewUserService(repo repositories.UserRepository) *UserService {
 }
 
 func (s *UserService) RegisterUser(user *models.User) error {
+	hashedPassword, err := utils.GenerateHashPassword(user.Password)
+	if err != nil {
+		return errors.New("erro ao processar senha")
+	}
+	user.Password = hashedPassword
 	user.Role = "CUSTOMER"
+
 	return s.repo.Create(user)
 }
 
@@ -37,18 +43,17 @@ func (s *UserService) UpgradeToStoreOwner(userID uint) error {
 func (s *UserService) AuthenticateUser(username, password string) (string, error) {
 	user, err := s.repo.GetByUsername(username)
 	if err != nil {
-		return "", errors.New("usuário não encontrado")
+		return "", errors.New("credenciais inválidas")
 	}
 
 	err = utils.VerifyPassword(user.Password, password)
 	if err != nil {
-		return "", errors.New("senha incorreta")
+		return "", errors.New("credenciais inválidas")
 	}
 
 	token, err := utils.GenerateJWT(user)
 	if err != nil {
 		return "", errors.New("erro ao gerar token")
 	}
-
 	return token, nil
 }

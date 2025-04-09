@@ -29,7 +29,11 @@ func (h *UserHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	if err := h.service.RegisterUser(&user); err != nil {
+	err := h.service.RegisterUser(&user)
+	if err != nil {
+		if err.Error() == "telefone já registrado" {
+			c.JSON(http.StatusConflict, gin.H{"error": "o telefone já está em uso"})
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao registrar usuário"})
 		return
 	}
